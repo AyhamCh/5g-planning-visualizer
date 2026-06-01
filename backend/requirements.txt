@@ -1,0 +1,9 @@
+fastapi>=0.110
+uvicorn[standard]>=0.27
+geopandas>=0.14
+pyogrio>=0.7
+shapely>=2.0
+pyyaml>=6.0
+# The agents themselves require their original deps (osmnx, rasterio, etc.).
+# Install those from your existing environment if you intend to run
+# /api/run-pipeline. The read-only endpoints only need the libs above.
