@@ -1,0 +1,68 @@
+STATISTIQUES TERRAIN & ENVIRONNEMENT v2
+======================================================================
+
+RELIEF (DEM SRTM):
+----------------------------------------------------------------------
+Altitude moyenne        : 45.7 m
+Altitude minimale       : 26.0 m
+Altitude maximale       : 62.0 m
+Rugosité moy. (std)     : 3.3 m
+Pente normalisée moy.   : 0.370
+
+OCCUPATION SOL NATUREL (ESA WorldCover):
+----------------------------------------------------------------------
+Forêt moy.              : 2.7%
+Eau moy.                : 3.9%
+Végétation moy.         : 2.9%
+
+CONTEXTE URBAIN (OSMnxUrbanAgent):
+----------------------------------------------------------------------
+Obstruction index moy.  : 0.409
+Hauteur bâti moy.       : 16.2 m
+
+IMPACT RADIO (terrain + bâti intégrés):
+----------------------------------------------------------------------
+Atténuation moy.        : 15.9 dB
+Atténuation max.        : 22.1 dB
+Probabilité LOS moy.    : 53.3%
+Complexité terrain moy. : 0.392
+
+PAR URBAN_CLASS (OSMnx):
+----------------------------------------------------------------------
+
+  [dense_urban]  33 cellules
+    Atténuation moy.  : 15.8 dB
+    LOS prob. moy.    : 49.5%
+    Complexité        : 0.408
+    Forêt moy.        : 1.2%
+    Altitude moy.     : 47.2 m
+
+  [hyper_dense]  1 cellules
+    Atténuation moy.  : 16.7 dB
+    LOS prob. moy.    : 40.3%
+    Complexité        : 0.427
+    Forêt moy.        : 0.0%
+    Altitude moy.     : 46.9 m
+
+  [periurban]  5 cellules
+    Atténuation moy.  : 16.4 dB
+    LOS prob. moy.    : 62.4%
+    Complexité        : 0.372
+    Forêt moy.        : 5.7%
+    Altitude moy.     : 41.6 m
+
+  [rural]  3 cellules
+    Atténuation moy.  : 13.4 dB
+    LOS prob. moy.    : 71.3%
+    Complexité        : 0.270
+    Forêt moy.        : 3.9%
+    Altitude moy.     : 40.0 m
+
+  [urban]  12 cellules
+    Atténuation moy.  : 16.3 dB
+    LOS prob. moy.    : 56.5%
+    Complexité        : 0.383
+    Forêt moy.        : 5.7%
+    Altitude moy.     : 44.7 m
+
+Cellules totales        : 54

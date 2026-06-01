@@ -1,0 +1,38 @@
+╔══════════════════════════════════════════════════╗
+║   Population & Demand Agent v2 — Rapport         ║
+╚══════════════════════════════════════════════════╝
+
+[ 1 ] Population (WorldPop)
+  Total habitants         : 19,471
+  Cellules peuplées       : 54
+  Densité moy.            : 20,824 hab/km²
+  Densité max.            : 28,052 hab/km²
+
+[ 2 ] Demande réseau
+  Demande totale (base)   : 31.4 Gbps
+  Demande totale (pic)    : 76.6 Gbps
+  Moy./cellule (base)     : 581 Mbps
+  Moy./cellule (pic)      : 1,418 Mbps
+
+[ 3 ] Modulation OSMnx
+  Facteur modul. moy.     : 1.034
+  Urban intensity moy.    : 0.536
+  Accessibility moy.      : 0.538
+  Obstruction moy.        : 0.408
+
+[ 4 ] Types d'usage
+    residential     :    37 cellules (68.5%)
+    mixed           :    16 cellules (29.6%)
+    commercial      :     1 cellules (1.9%)
+
+[ 5 ] Catégories de demande
+    medium          :    32 cellules (59.3%)
+    high            :    12 cellules (22.2%)
+    low             :    10 cellules (18.5%)
+
+[ 6 ] Demande pic par classe urbaine
+    rural           : moy 0.094 Gbps  | total 0.28 Gbps
+    periurban       : moy 0.359 Gbps  | total 1.79 Gbps
+    urban           : moy 0.713 Gbps  | total 8.55 Gbps
+    dense_urban     : moy 1.843 Gbps  | total 60.83 Gbps
+    hyper_dense     : moy 5.132 Gbps  | total 5.13 Gbps

@@ -1,0 +1,55 @@
+╔══════════════════════════════════════════════════╗
+║     OSMnx Urban Analysis v2 — Rapport            ║
+╚══════════════════════════════════════════════════╝
+
+[ 1 ] Géométrie & Volumétrie
+  Total cellules           : 54
+  Cellules avec bâtiments  : 54
+  Total bâtiments          : 2126
+  Surface bâtie totale     : 1,074,063 m²
+
+[ 2 ] Densité
+  Densité bâtie moy.       : 0.497
+  Bâtiments/km² (moy.)     : 984.3
+
+[ 3 ] Hauteur
+  Hauteur moy.             : 16.2 m
+  Hauteur max              : 20.1 m
+  Étages moy.              : 5.4
+
+[ 4 ] Intensité Urbaine
+  Moyenne                  : 0.536
+  Médiane                  : 0.599
+  Écart-type               : 0.180
+
+[ 5 ] Phénomènes Radio
+  Obstruction (moy.)       : 0.408
+  Complexité propagation   : 0.502
+  Risque handover          : 0.511
+
+[ 6 ] Structure Urbaine
+  Compacité moy.           : 0.550
+  Distribution             :
+    compact         :    25 cellules (46.3%)
+    semi_compact    :    17 cellules (31.5%)
+    sprawled        :     8 cellules (14.8%)
+    dispersed       :     4 cellules (7.4%)
+
+[ 7 ] Classification Urbaine
+    dense_urban     :    33 cellules (61.1%)
+    urban           :    12 cellules (22.2%)
+    periurban       :     5 cellules (9.3%)
+    rural           :     3 cellules (5.6%)
+    hyper_dense     :     1 cellules (1.9%)
+
+[ 8 ] Accessibilité Routière
+  Cellules avec routes     : 54
+  Score moy.               : 0.538
+  Score médian             : 0.544
+  Densité routes (moy.)    : 49871 m/km²
+  Qualité routes (moy.)    : 0.178
+  Densité intersections    : 618.5 /km²
+  Classes accessibilité    :
+    good            :    26 cellules (48.1%)
+    moderate        :    24 cellules (44.4%)
+    poor            :     4 cellules (7.4%)

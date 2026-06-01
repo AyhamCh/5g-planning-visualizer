@@ -1,0 +1,75 @@
+======================================================================
+   RAPPORT PLACEMENT SITES 5G — SitePlacementAgent v3
+   Généré le : 2026-05-05 09:46:10
+======================================================================
+
+[ RÉSUMÉ ]
+  Sites recommandés   : 4
+  Score moyen         : 0.7849
+  Score max           : 1.0000
+
+[ DISTRIBUTION PAR TYPE DE SITE ]
+  micro_cell               :   3 sites
+  small_cell_dense         :   1 sites
+
+[ DISTRIBUTION PAR URBAN CLASS ]
+  dense_urban    :   3 sites  (score moy: 0.713  déficit moy: 1.853G)
+  hyper_dense    :   1 sites  (score moy: 1.000  déficit moy: 4.527G)
+
+[ TOP 10 SITES PAR PRIORITÉ ]
+  Rank  urban_class      type                         score    déficit    LOS  Justification
+  ----------------------------------------------------------------------------------------------------
+     1  hyper_dense      small_cell_dense            1.0000      4.53G  40.3%  déficit capacité critique (4.5 Gbps) | risque congestion critique (overload=0.88) | densité pop. élevée (21,354 hab/km²) | LOS limitée (40%) → small cell recommandé
+     2  dense_urban      micro_cell                  0.8018      2.30G  46.9%  déficit capacité significatif (2.3 Gbps) | risque congestion critique (overload=0.77) | densité pop. élevée (28,047 hab/km²)
+     3  dense_urban      micro_cell                  0.7990      2.38G  30.8%  déficit capacité significatif (2.4 Gbps) | risque congestion critique (overload=0.77) | densité pop. élevée (28,049 hab/km²) | LOS limitée (31%) → small cell recommandé
+     4  dense_urban      micro_cell                  0.5386      0.88G  32.2%  déficit capacité modéré (0.88 Gbps) | risque congestion élevé | LOS limitée (32%) → small cell recommandé
+
+[ DÉTAIL DE TOUS LES SITES ]
+
+  Site #01
+    Coordonnées    : 652278.040072, 6862976.133419
+    Urban class    : hyper_dense
+    Type           : small_cell_dense
+    Score          : 1.0000
+    Déficit        : 4.527 Gbps
+    Pop. couverte  : ~369 hab
+    Rayon couv.    : ~61 m
+    LOS            : 40.3%
+    Justification  : déficit capacité critique (4.5 Gbps) | risque congestion critique (overload=0.88) | densité pop. élevée (21,354 hab/km²) | LOS limitée (40%) → small cell recommandé
+
+  Site #02
+    Coordonnées    : 652540.562761, 6862842.549863
+    Urban class    : dense_urban
+    Type           : micro_cell
+    Score          : 0.8018
+    Déficit        : 2.303 Gbps
+    Pop. couverte  : ~485 hab
+    Rayon couv.    : ~179 m
+    LOS            : 46.9%
+    Justification  : déficit capacité significatif (2.3 Gbps) | risque congestion critique (overload=0.77) | densité pop. élevée (28,047 hab/km²)
+
+  Site #03
+    Coordonnées    : 652537.332543, 6862448.278320
+    Urban class    : dense_urban
+    Type           : micro_cell
+    Score          : 0.7990
+    Déficit        : 2.379 Gbps
+    Pop. couverte  : ~485 hab
+    Rayon couv.    : ~159 m
+    LOS            : 30.8%
+    Justification  : déficit capacité significatif (2.4 Gbps) | risque congestion critique (overload=0.77) | densité pop. élevée (28,049 hab/km²) | LOS limitée (31%) → small cell recommandé
+
+  Site #04
+    Coordonnées    : 652142.983363, 6862582.958304
+    Urban class    : dense_urban
+    Type           : micro_cell
+    Score          : 0.5386
+    Déficit        : 0.877 Gbps
+    Pop. couverte  : ~253 hab
+    Rayon couv.    : ~159 m
+    LOS            : 32.2%
+    Justification  : déficit capacité modéré (0.88 Gbps) | risque congestion élevé | LOS limitée (32%) → small cell recommandé
+
+======================================================================
+  Fin du rapport
+======================================================================
