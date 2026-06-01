@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
-import L from "leaflet";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type {
   GridFC,
   SitesFC,
@@ -19,10 +18,8 @@ function colorFor(p: GridProps, by: ColorBy): string {
   if (by === "coverage_class") return COVERAGE_COLORS[p.coverage_class] ?? "#64748b";
   if (by === "demand_class") return DEMAND_COLORS[p.demand_class] ?? "#64748b";
   if (by === "urban_class") return URBAN_COLORS[p.urban_class] ?? "#64748b";
-  // los_probability 0..1 → red→green
   const t = Math.max(0, Math.min(1, p.los_probability));
-  const hue = 0 + 140 * t;
-  return `hsl(${hue} 70% 50%)`;
+  return `hsl(${(140 * t).toFixed(0)} 70% 50%)`;
 }
 
 function popupHtml(p: GridProps): string {
@@ -57,11 +54,15 @@ export function NetworkMap({
   height?: string | number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const gridLayer = useRef<L.GeoJSON | null>(null);
-  const sitesLayer = useRef<L.LayerGroup | null>(null);
+  // Hold leaflet module + map; both are browser-only.
+  const stateRef = useRef<{
+    L: typeof import("leaflet") | null;
+    map: import("leaflet").Map | null;
+    grid: import("leaflet").GeoJSON | null;
+    sites: import("leaflet").LayerGroup | null;
+  }>({ L: null, map: null, grid: null, sites: null });
+  const [ready, setReady] = useState(false);
 
-  // bbox
   const bbox = useMemo(() => {
     let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
     for (const f of grid.features) {
@@ -74,37 +75,44 @@ export function NetworkMap({
         }
       }
     }
-    return [
-      [minLat, minLng],
-      [maxLat, maxLng],
-    ] as L.LatLngBoundsLiteral;
+    return [[minLat, minLng], [maxLat, maxLng]] as [[number, number], [number, number]];
   }, [grid]);
 
+  // Init map (browser only)
   useEffect(() => {
-    if (!ref.current || mapRef.current) return;
-    const map = L.map(ref.current, { zoomControl: true, attributionControl: true });
-    L.tileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      {
-        maxZoom: 19,
-        attribution:
-          '© <a href="https://www.openstreetmap.org/copyright">OSM</a> · © <a href="https://carto.com/attributions">CARTO</a>',
-      },
-    ).addTo(map);
-    map.fitBounds(bbox, { padding: [24, 24] });
-    mapRef.current = map;
+    if (typeof window === "undefined" || !ref.current || stateRef.current.map) return;
+    let cancelled = false;
+    (async () => {
+      const L = (await import("leaflet")).default;
+      if (cancelled || !ref.current) return;
+      const map = L.map(ref.current, { zoomControl: true });
+      L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+        {
+          maxZoom: 19,
+          attribution:
+            '© <a href="https://www.openstreetmap.org/copyright">OSM</a> · © <a href="https://carto.com/attributions">CARTO</a>',
+        },
+      ).addTo(map);
+      map.fitBounds(bbox, { padding: [24, 24] });
+      stateRef.current.L = L;
+      stateRef.current.map = map;
+      setReady(true);
+    })();
     return () => {
-      map.remove();
-      mapRef.current = null;
+      cancelled = true;
+      stateRef.current.map?.remove();
+      stateRef.current = { L: null, map: null, grid: null, sites: null };
     };
-  }, [bbox]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // grid layer
+  // Grid layer
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-    gridLayer.current?.remove();
-    gridLayer.current = L.geoJSON(grid as GeoJSON.GeoJsonObject, {
+    const { L, map } = stateRef.current;
+    if (!ready || !L || !map) return;
+    stateRef.current.grid?.remove();
+    stateRef.current.grid = L.geoJSON(grid as GeoJSON.GeoJsonObject, {
       style: (feat) => {
         const p = (feat?.properties ?? {}) as GridProps;
         return {
@@ -123,13 +131,13 @@ export function NetworkMap({
         );
       },
     }).addTo(map);
-  }, [grid, colorBy]);
+  }, [grid, colorBy, ready]);
 
-  // sites layer
+  // Sites layer
   useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-    sitesLayer.current?.remove();
+    const { L, map } = stateRef.current;
+    if (!ready || !L || !map) return;
+    stateRef.current.sites?.remove();
     if (!showSites) return;
     const group = L.layerGroup();
     for (const f of sites.features) {
@@ -156,8 +164,8 @@ export function NetworkMap({
         )
         .addTo(group);
     }
-    sitesLayer.current = group.addTo(map);
-  }, [sites, showSites]);
+    stateRef.current.sites = group.addTo(map);
+  }, [sites, showSites, ready]);
 
   return <div ref={ref} style={{ height, width: "100%" }} />;
 }
