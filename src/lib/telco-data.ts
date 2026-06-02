@@ -99,8 +99,64 @@ async function fetchJson<T>(staticPath: string, apiPath: string): Promise<T> {
 export const fetchGrid = () =>
   fetchJson<GridFC>("/data/grid.geojson", "/api/grid");
 
-export const fetchSites = () =>
-  fetchJson<SitesFC>("/data/sites.geojson", "/api/sites");
+// recommended_sites_v3.gpkg stores each site as the polygon of its parent cell.
+// The UI needs a Point (lng,lat) per site — convert polygons to their centroid
+// here so every consumer (map markers, tables, decision view) gets [lng,lat].
+function polygonCentroid(coords: number[][][]): [number, number] {
+  const ring = coords[0] ?? [];
+  if (ring.length === 0) return [0, 0];
+  // Use site_props.cx/cy if available downstream; here compute geometric centroid
+  // of the outer ring (shoelace) — robust for the small rectangular cell tiles.
+  let area = 0, cx = 0, cy = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [x1, y1] = ring[j];
+    const [x2, y2] = ring[i];
+    const f = x1 * y2 - x2 * y1;
+    area += f;
+    cx += (x1 + x2) * f;
+    cy += (y1 + y2) * f;
+  }
+  if (area === 0) {
+    // Degenerate ring → fall back to vertex average
+    const n = ring.length;
+    const sx = ring.reduce((a, [x]) => a + x, 0) / n;
+    const sy = ring.reduce((a, [, y]) => a + y, 0) / n;
+    return [sx, sy];
+  }
+  area *= 0.5;
+  return [cx / (6 * area), cy / (6 * area)];
+}
+
+export const fetchSites = async (): Promise<SitesFC> => {
+  const raw = await fetchJson<GeoJSON.FeatureCollection<GeoJSON.Geometry, SiteProps>>(
+    "/data/sites.geojson",
+    "/api/sites",
+  );
+  const features = raw.features.map((f) => {
+    let lng: number | undefined;
+    let lat: number | undefined;
+    const g = f.geometry as GeoJSON.Geometry;
+    if (g.type === "Point") {
+      [lng, lat] = g.coordinates as [number, number];
+    } else if (g.type === "Polygon") {
+      [lng, lat] = polygonCentroid(g.coordinates as number[][][]);
+    } else if (g.type === "MultiPolygon") {
+      [lng, lat] = polygonCentroid((g.coordinates as number[][][][])[0]);
+    }
+    // Prefer agent-provided cx/cy when present (set by SitePlacementAgent).
+    const p = f.properties;
+    if (typeof p.cx === "number" && typeof p.cy === "number") {
+      lng = p.cx;
+      lat = p.cy;
+    }
+    return {
+      type: "Feature" as const,
+      properties: p,
+      geometry: { type: "Point" as const, coordinates: [lng ?? 0, lat ?? 0] },
+    };
+  });
+  return { type: "FeatureCollection", name: raw.name, features } as SitesFC;
+};
 
 // ── Derived KPIs (computed from real grid / sites, no hardcoding) ──────────
 export interface Kpis {
