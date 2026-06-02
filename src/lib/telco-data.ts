@@ -155,7 +155,7 @@ export const fetchSites = async (): Promise<SitesFC> => {
       geometry: { type: "Point" as const, coordinates: [lng ?? 0, lat ?? 0] },
     };
   });
-  return { type: "FeatureCollection", name: raw.name, features } as SitesFC;
+  return { type: "FeatureCollection", features } as SitesFC;
 };
 
 // ── Derived KPIs (computed from real grid / sites, no hardcoding) ──────────
