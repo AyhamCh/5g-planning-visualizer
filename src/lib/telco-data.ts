@@ -90,6 +90,10 @@ export type SitesFC = GeoJSON.FeatureCollection<GeoJSON.Point, SiteProps>;
 const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, "");
 
 async function fetchJson<T>(staticPath: string, apiPath: string): Promise<T> {
+  // Avoid SSR fetch of relative URLs (no origin). Return empty FC on server.
+  if (typeof window === "undefined" && !API_BASE) {
+    return { type: "FeatureCollection", features: [] } as unknown as T;
+  }
   const url = API_BASE ? `${API_BASE}${apiPath}` : staticPath;
   const r = await fetch(url);
   if (!r.ok) throw new Error(`${url} → ${r.status}`);
