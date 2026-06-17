@@ -13,6 +13,7 @@ import { Route as WhatIfRouteImport } from './routes/what-if'
 import { Route as SitesRouteImport } from './routes/sites'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as DecisionRouteImport } from './routes/decision'
+import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AgentsRouteImport } from './routes/agents'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -36,6 +37,11 @@ const DecisionRoute = DecisionRouteImport.update({
   path: '/decision',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AgentsRoute = AgentsRouteImport.update({
   id: '/agents',
   path: '/agents',
@@ -50,6 +56,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/agents': typeof AgentsRoute
+  '/chat': typeof ChatRoute
   '/decision': typeof DecisionRoute
   '/map': typeof MapRoute
   '/sites': typeof SitesRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/agents': typeof AgentsRoute
+  '/chat': typeof ChatRoute
   '/decision': typeof DecisionRoute
   '/map': typeof MapRoute
   '/sites': typeof SitesRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/agents': typeof AgentsRoute
+  '/chat': typeof ChatRoute
   '/decision': typeof DecisionRoute
   '/map': typeof MapRoute
   '/sites': typeof SitesRoute
@@ -74,13 +83,21 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/agents' | '/decision' | '/map' | '/sites' | '/what-if'
+  fullPaths:
+    | '/'
+    | '/agents'
+    | '/chat'
+    | '/decision'
+    | '/map'
+    | '/sites'
+    | '/what-if'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/agents' | '/decision' | '/map' | '/sites' | '/what-if'
+  to: '/' | '/agents' | '/chat' | '/decision' | '/map' | '/sites' | '/what-if'
   id:
     | '__root__'
     | '/'
     | '/agents'
+    | '/chat'
     | '/decision'
     | '/map'
     | '/sites'
@@ -90,6 +107,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AgentsRoute: typeof AgentsRoute
+  ChatRoute: typeof ChatRoute
   DecisionRoute: typeof DecisionRoute
   MapRoute: typeof MapRoute
   SitesRoute: typeof SitesRoute
@@ -126,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DecisionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/agents': {
       id: '/agents'
       path: '/agents'
@@ -146,6 +171,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AgentsRoute: AgentsRoute,
+  ChatRoute: ChatRoute,
   DecisionRoute: DecisionRoute,
   MapRoute: MapRoute,
   SitesRoute: SitesRoute,
