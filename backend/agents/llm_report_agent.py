@@ -85,7 +85,7 @@ def build_prompt_sites(txt: str) -> str:
 Voici les résultats des agents 5G incluant le rapport SitePlacementAgent :
 {txt}
 
-Pour chacun des 4 sites recommandés, génère une analyse JSON :
+"Pour CHAQUE site mentionné dans le rapport SitePlacementAgent, génère une analyse JSON. Inclus TOUS les sites sans exception :"
 {{
   "sites": [
     {{
@@ -144,6 +144,29 @@ Génère des recommandations stratégiques JSON :
 }}"""
 
 
+def build_prompt_one_site(site_raw: str, site_num: int) -> str:
+    return f"""{SYSTEM_CONTEXT}
+
+Voici les données du site #{site_num} issu du rapport SitePlacementAgent :
+{site_raw}
+
+Génère une analyse JSON pour CE site uniquement :
+{{
+  "numero": {site_num},
+  "priorite": "CRITIQUE" ou "HAUTE" ou "MOYENNE",
+  "type_site": "type technique du site",
+  "urban_class": "classe urbaine",
+  "score": "valeur du score composite",
+  "deficit_gbps": "valeur du déficit",
+  "justification_technique": "2-3 phrases de justification technique détaillée",
+  "consignes_deploiement": [
+    "consigne 1 concrète et actionnable",
+    "consigne 2 concrète et actionnable",
+    "consigne 3 concrète et actionnable"
+  ],
+  "risques": "1 phrase sur les risques ou contraintes de déploiement"
+}}"""
+
 # ─────────────────────────────────────────────
 # APPEL OLLAMA
 # ─────────────────────────────────────────────
@@ -156,9 +179,10 @@ def call_ollama(prompt: str, label: str = "") -> dict:
         "model":  OLLAMA_MODEL,
         "prompt": prompt,
         "stream": False,
+        "format": "json",
         "options": {
             "temperature": 0.3,
-            "num_predict": 600,
+            "num_predict": 1500,
         }
     }
 
@@ -171,6 +195,14 @@ def call_ollama(prompt: str, label: str = "") -> dict:
         )
 
     raw = resp.json().get("response", "")
+
+    print("\n")
+    print("=" * 80)
+    print(f"RAW RESPONSE [{label}]")
+    print("=" * 80)
+    print(raw)
+    print("=" * 80)
+    print("\n")
 
     # Extraire le JSON (ignorer texte parasite)
     start = raw.find("{")
@@ -467,9 +499,17 @@ def build_pdf(exec_data: dict, sites_data: dict, reco_data: dict, output_path: s
     print(f"\n  ✓ PDF généré : {output_path}")
 
 
+
+def extract_sites_blocks(txt: str) -> list[str]:
+    """Extrait chaque bloc Site #XX du rapport SitePlacementAgent."""
+    import re
+    blocks = re.split(r'(?=\s*Site #\d+)', txt)
+    return [b.strip() for b in blocks if re.match(r'\s*Site #\d+', b)]
+
 # ─────────────────────────────────────────────
 # POINT D'ENTRÉE
 # ─────────────────────────────────────────────
+
 
 def main():
     print("=" * 60)
@@ -483,13 +523,18 @@ def main():
 
     txt = txt_path.read_text(encoding="utf-8")
     # Limiter la taille pour le modèle 3B (context window ~4k tokens)
-    txt_trimmed = txt[:3500]
+    txt_trimmed = txt[:6000]
     print(f"  Fichier lu : {len(txt)} caractères (trimmed: {len(txt_trimmed)})")
 
     # 2. Appels LLM
     print("\n[ GÉNÉRATION LLM ]")
     exec_data  = call_ollama(build_prompt_executive_summary(txt_trimmed), "Résumé exécutif")
-    sites_data = call_ollama(build_prompt_sites(txt_trimmed),             "Sites recommandés")
+    site_blocks = extract_sites_blocks(txt)
+    sites_list = []
+    for i, block in enumerate(site_blocks, 1):
+        site_result = call_ollama(build_prompt_one_site(block, i), f"Site #{i}")
+        sites_list.append(site_result)
+    sites_data = {"sites": sites_list}
     reco_data  = call_ollama(build_prompt_recommendations(txt_trimmed),   "Recommandations")
 
     # 3. Construction PDF
