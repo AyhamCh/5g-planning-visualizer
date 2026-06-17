@@ -31,7 +31,8 @@ from typing import Any
 import geopandas as gpd
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, Response, FileResponse
+from pydantic import BaseModel
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 BACKEND_DIR = Path(__file__).resolve().parent
