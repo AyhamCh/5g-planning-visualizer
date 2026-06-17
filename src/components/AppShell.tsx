@@ -1,51 +1,72 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import {
+  LayoutDashboard,
+  Map as MapIcon,
+  Radio,
+  Cpu,
+  Sparkles,
+  FlaskConical,
+  MessageSquare,
+  FileText,
+} from "lucide-react";
 
 const NAV = [
-  { to: "/", label: "Overview" },
-  { to: "/map", label: "Network Map" },
-  { to: "/sites", label: "Recommended Sites" },
-  { to: "/agents", label: "Agents" },
-  { to: "/decision", label: "Decision" },
-  { to: "/what-if", label: "What-If" },
+  { to: "/", label: "Overview", icon: LayoutDashboard },
+  { to: "/map", label: "Network Map", icon: MapIcon },
+  { to: "/sites", label: "Recommended Sites", icon: Radio },
+  { to: "/agents", label: "Agents", icon: Cpu },
+  { to: "/decision", label: "Decision", icon: Sparkles },
+  { to: "/what-if", label: "What-If", icon: FlaskConical },
+  { to: "/chat", label: "5G AI Assistant", icon: MessageSquare },
+  { to: "/reports", label: "Reports", icon: FileText },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
   const path = useRouterState({ select: (s) => s.location.pathname });
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="border-b border-border bg-card/60 backdrop-blur sticky top-0 z-40">
-        <div className="mx-auto max-w-[1600px] px-6 h-14 flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
-            <span className="inline-block size-2 rounded-full bg-primary shadow-[0_0_12px_var(--color-primary)]" />
-            <span>5G Planner</span>
-            <span className="mono text-xs text-muted-foreground ml-1">AI multi-agent</span>
-          </Link>
-          <nav className="flex items-center gap-1">
-            {NAV.map((n) => {
-              const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
-              return (
-                <Link
-                  key={n.to}
-                  to={n.to}
-                  className={[
-                    "px-3 py-1.5 rounded-md text-sm transition-colors",
-                    active
-                      ? "bg-secondary text-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/60",
-                  ].join(" ")}
-                >
-                  {n.label}
-                </Link>
-              );
-            })}
-          </nav>
-          <div className="ml-auto mono text-xs text-muted-foreground">
-            data · final_merged_grid.gpkg · recommended_sites_v3.gpkg
+    <div className="min-h-screen flex">
+      <aside className="w-60 shrink-0 border-r border-border bg-card/40 backdrop-blur sticky top-0 h-screen flex flex-col">
+        <Link to="/" className="flex items-center gap-2 px-5 h-16 border-b border-border">
+          <span className="relative inline-flex">
+            <span className="inline-block size-2.5 rounded-full bg-primary shadow-[0_0_16px_var(--color-primary)]" />
+            <span className="absolute inset-0 rounded-full bg-primary/40 animate-ping" />
+          </span>
+          <div className="leading-tight">
+            <div className="font-semibold tracking-tight">5G Planner</div>
+            <div className="mono text-[10px] text-muted-foreground uppercase">AI multi-agent</div>
           </div>
+        </Link>
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          {NAV.map((n) => {
+            const Icon = n.icon;
+            const active = n.to === "/" ? path === "/" : path.startsWith(n.to);
+            return (
+              <Link
+                key={n.to}
+                to={n.to}
+                className={[
+                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all",
+                  active
+                    ? "bg-primary/15 text-foreground border border-primary/30 shadow-[0_0_20px_-8px_var(--color-primary)]"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/60 border border-transparent",
+                ].join(" ")}
+              >
+                <Icon className="size-4" />
+                <span>{n.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="px-4 py-3 border-t border-border mono text-[10px] text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <span className="size-1.5 rounded-full bg-[var(--color-success)]" />
+            Pipeline online
+          </div>
+          <div className="mt-1 opacity-70">final_merged_grid · v3 sites</div>
         </div>
-      </header>
-      <main className="flex-1">{children}</main>
+      </aside>
+      <main className="flex-1 min-w-0">{children}</main>
     </div>
   );
 }
@@ -80,7 +101,9 @@ export function Card({
   className?: string;
 }) {
   return (
-    <div className={`rounded-lg border border-border bg-card p-4 ${className}`}>
+    <div
+      className={`rounded-xl border border-border bg-card/80 backdrop-blur p-4 shadow-[0_1px_0_0_rgba(255,255,255,0.04)_inset,0_8px_24px_-12px_rgba(0,0,0,0.5)] transition-all hover:border-primary/30 ${className}`}
+    >
       {title && (
         <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-3">
           {title}
@@ -111,8 +134,8 @@ export function Stat({
           ? "text-[var(--color-critical)]"
           : "text-foreground";
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
+    <div className="rounded-xl border border-border bg-card/80 backdrop-blur p-4 transition-all hover:border-primary/30">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</div>
       <div className={`mt-2 text-2xl font-semibold mono ${toneCls}`}>
         {value}
         {unit && <span className="text-sm text-muted-foreground ml-1">{unit}</span>}
@@ -140,7 +163,7 @@ export function DistributionBar({
           </div>
           <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
             <div
-              className="h-full rounded-full"
+              className="h-full rounded-full transition-all"
               style={{
                 width: `${it.ratio * 100}%`,
                 background: colors?.[it.label] ?? "var(--color-primary)",

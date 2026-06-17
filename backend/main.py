@@ -31,7 +31,8 @@ from typing import Any
 import geopandas as gpd
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, Response, FileResponse
+from pydantic import BaseModel
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 BACKEND_DIR = Path(__file__).resolve().parent
@@ -230,6 +231,59 @@ def health():
         "grid_exists": GRID_PATH.exists(),
         "sites_exists": SITES_PATH.exists(),
     }
+
+# ── RAG chat (delegates to agents/rag_agent.py if importable) ───────────────
+class ChatBody(BaseModel):
+    question: str
+
+@app.post("/api/chat")
+def chat(body: ChatBody):
+    """Question the RAG agent. Falls back to a degraded answer if the
+    Chroma/Ollama stack is not available locally."""
+    try:
+        # The RAG pipeline (chromadb + sentence-transformers + ollama) is
+        # heavy and only meant to run on the analyst's workstation.
+        from agents.rag_agent import answer_question  # type: ignore
+        result = answer_question(body.question)
+        # answer_question returns {"answer": str, "sources": [str]}
+        return result
+    except Exception as e:
+        return {
+            "answer": (
+                "Le moteur RAG local n'est pas initialisé sur ce serveur "
+                f"({e.__class__.__name__}). Lancez `python backend/agents/rag_agent.py` "
+                "pour indexer la base, puis vérifiez qu'Ollama tourne (qwen3:8b)."
+            ),
+            "sources": [],
+        }
+
+# ── Reports (PDFs produced by llm_report_agent.py) ──────────────────────────
+REPORTS_DIR = Path(os.environ.get("REPORTS_DIR", BACKEND_DIR / "outputs"))
+
+@app.get("/api/reports")
+def list_reports():
+    if not REPORTS_DIR.exists():
+        return []
+    items = []
+    for p in sorted(REPORTS_DIR.glob("*.pdf"), key=lambda x: x.stat().st_mtime, reverse=True):
+        st = p.stat()
+        items.append({
+            "name": p.name,
+            "date": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(st.st_mtime)),
+            "path": f"/api/reports/{p.name}",
+            "size": st.st_size,
+        })
+    return items
+
+@app.get("/api/reports/{name}")
+def get_report(name: str):
+    # Prevent path traversal
+    if "/" in name or "\\" in name or not name.lower().endswith(".pdf"):
+        raise HTTPException(400, "Invalid report name")
+    p = REPORTS_DIR / name
+    if not p.exists():
+        raise HTTPException(404, f"Report not found: {name}")
+    return FileResponse(p, media_type="application/pdf", filename=name)
 
 # ── Root redirect for convenience ───────────────────────────────────────────
 @app.get("/")
