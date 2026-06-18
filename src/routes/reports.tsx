@@ -71,7 +71,8 @@ function ReportsBody() {
 
   useEffect(() => {
     if (!selected || selected.kind === "pdf") return setTextBody("");
-    fetch(`${API_BASE}${selected.path}`)
+    const url = live ? `${API_BASE}${selected.path}` : selected.path;
+    fetch(url)
       .then((r) => r.text())
       .then(setTextBody)
       .catch(() => setTextBody("Failed to load."));
