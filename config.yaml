@@ -1,0 +1,11 @@
+# 5G AI Project — pipeline config
+project_name: 5g_ai_project
+crs_in: EPSG:32631
+crs_out: EPSG:4326
+outputs_dir: outputs
+results_dir: results
+rag:
+  chroma_path: ./chroma_db
+  collection: knowledge_base
+  embed_model: intfloat/multilingual-e5-base
+  llm_model: qwen3:8b

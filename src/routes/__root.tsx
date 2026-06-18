@@ -7,7 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { Suspense, useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -85,7 +85,15 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-background text-sm text-muted-foreground">
+            Loading 5G Planner…
+          </div>
+        }
+      >
+        <Outlet />
+      </Suspense>
     </QueryClientProvider>
   );
 }

@@ -1,0 +1,342 @@
+╔══════════════════════════════════════════════════╗
+║     OSMnx Urban Analysis v2 — Rapport            ║
+╚══════════════════════════════════════════════════╝
+
+[ 1 ] Géométrie & Volumétrie
+  Total cellules           : 54
+  Cellules avec bâtiments  : 54
+  Total bâtiments          : 2126
+  Surface bâtie totale     : 1,074,063 m²
+
+[ 2 ] Densité
+  Densité bâtie moy.       : 0.497
+  Bâtiments/km² (moy.)     : 984.3
+
+[ 3 ] Hauteur
+  Hauteur moy.             : 16.2 m
+  Hauteur max              : 20.1 m
+  Étages moy.              : 5.4
+
+[ 4 ] Intensité Urbaine
+  Moyenne                  : 0.536
+  Médiane                  : 0.599
+  Écart-type               : 0.180
+
+[ 5 ] Phénomènes Radio
+  Obstruction (moy.)       : 0.408
+  Complexité propagation   : 0.502
+  Risque handover          : 0.511
+
+[ 6 ] Structure Urbaine
+  Compacité moy.           : 0.550
+  Distribution             :
+    compact         :    25 cellules (46.3%)
+    semi_compact    :    17 cellules (31.5%)
+    sprawled        :     8 cellules (14.8%)
+    dispersed       :     4 cellules (7.4%)
+
+[ 7 ] Classification Urbaine
+    dense_urban     :    33 cellules (61.1%)
+    urban           :    12 cellules (22.2%)
+    periurban       :     5 cellules (9.3%)
+    rural           :     3 cellules (5.6%)
+    hyper_dense     :     1 cellules (1.9%)
+
+[ 8 ] Accessibilité Routière
+  Cellules avec routes     : 54
+  Score moy.               : 0.538
+  Score médian             : 0.544
+  Densité routes (moy.)    : 49871 m/km²
+  Qualité routes (moy.)    : 0.178
+  Densité intersections    : 618.5 /km²
+  Classes accessibilité    :
+    good            :    26 cellules (48.1%)
+    moderate        :    24 cellules (44.4%)
+    poor            :     4 cellules (7.4%)
+
+
+
+
+
+
+
+
+╔══════════════════════════════════════════════════╗
+║   Population & Demand Agent v2 — Rapport         ║
+╚══════════════════════════════════════════════════╝
+
+[ 1 ] Population (WorldPop)
+  Total habitants         : 19,471
+  Cellules peuplées       : 54
+  Densité moy.            : 20,824 hab/km²
+  Densité max.            : 28,052 hab/km²
+
+[ 2 ] Demande réseau
+  Demande totale (base)   : 31.4 Gbps
+  Demande totale (pic)    : 76.6 Gbps
+  Moy./cellule (base)     : 581 Mbps
+  Moy./cellule (pic)      : 1,418 Mbps
+
+[ 3 ] Modulation OSMnx
+  Facteur modul. moy.     : 1.034
+  Urban intensity moy.    : 0.536
+  Accessibility moy.      : 0.538
+  Obstruction moy.        : 0.408
+
+[ 4 ] Types d'usage
+    residential     :    37 cellules (68.5%)
+    mixed           :    16 cellules (29.6%)
+    commercial      :     1 cellules (1.9%)
+
+[ 5 ] Catégories de demande
+    medium          :    32 cellules (59.3%)
+    high            :    12 cellules (22.2%)
+    low             :    10 cellules (18.5%)
+
+[ 6 ] Demande pic par classe urbaine
+    rural           : moy 0.094 Gbps  | total 0.28 Gbps
+    periurban       : moy 0.359 Gbps  | total 1.79 Gbps
+    urban           : moy 0.713 Gbps  | total 8.55 Gbps
+    dense_urban     : moy 1.843 Gbps  | total 60.83 Gbps
+    hyper_dense     : moy 5.132 Gbps  | total 5.13 Gbps
+
+
+
+
+
+
+
+STATISTIQUES COUVERTURE RÉSEAU 5G (v2 - OSMnx aware)
+======================================================================
+
+COUVERTURE GLOBALE:
+----------------------------------------------------------------------
+Cellules totales        : 54
+Cellules couvertes      : 54 (100.0%)
+Cellules non couvertes  : 0
+Cellules avec 5G        : 10 (18.5%)
+Cellules hotspot risk   : 25 (46.3%)
+
+ANTENNES:
+----------------------------------------------------------------------
+Antennes dans zone      : 8,104
+  - LTE                 : 7,964
+  - NR (5G)             : 140
+Antennes moy./cellule   : 10.0
+Antennes max./cellule   : 10
+
+CAPACITÉ vs DEMANDE:
+----------------------------------------------------------------------
+Capacité totale         : 50.6 Gbps
+Demande totale (pic)    : 76.6 Gbps
+Déficit total           : 25.9 Gbps
+Capacité moy./cellule   : 0.938 Gbps
+Demande moy./cellule    : 1.418 Gbps
+
+SCORES:
+----------------------------------------------------------------------
+Score couverture moyen  : 0.363
+Score surcharge moyen   : 0.326
+
+CLASSIFICATION COUVERTURE:
+----------------------------------------------------------------------
+uncovered      :    18 cellules (33.33%)
+critical       :    10 cellules (18.52%)
+adequate       :     8 cellules (14.81%)
+good           :    18 cellules (33.33%)
+excellent      :     0 cellules ( 0.00%)
+
+PAR URBAN_CLASS (OSMnx):
+----------------------------------------------------------------------
+
+  [dense_urban]  33 cellules
+    Couverture       : 100.0%
+    Score moyen      : 0.196
+    Capacité moy.    : 0.879 Gbps
+    Demande moy.     : 1.843 Gbps
+    Déficit total    : 31.8 Gbps
+
+  [hyper_dense]  1 cellules
+    Couverture       : 100.0%
+    Score moyen      : 0.000
+    Capacité moy.    : 0.605 Gbps
+    Demande moy.     : 5.132 Gbps
+    Déficit total    : 4.5 Gbps
+
+  [periurban]  5 cellules
+    Couverture       : 100.0%
+    Score moyen      : 0.725
+    Capacité moy.    : 0.961 Gbps
+    Demande moy.     : 0.359 Gbps
+    Déficit total    : 0.0 Gbps
+
+  [rural]  3 cellules
+    Couverture       : 100.0%
+    Score moyen      : 0.746
+    Capacité moy.    : 1.052 Gbps
+    Demande moy.     : 0.094 Gbps
+    Déficit total    : 0.0 Gbps
+
+  [urban]  12 cellules
+    Couverture       : 100.0%
+    Score moyen      : 0.607
+    Capacité moy.    : 1.090 Gbps
+    Demande moy.     : 0.713 Gbps
+    Déficit total    : 0.0 Gbps
+
+
+
+
+
+
+STATISTIQUES TERRAIN & ENVIRONNEMENT v2
+======================================================================
+
+RELIEF (DEM SRTM):
+----------------------------------------------------------------------
+Altitude moyenne        : 45.7 m
+Altitude minimale       : 26.0 m
+Altitude maximale       : 62.0 m
+Rugosité moy. (std)     : 3.3 m
+Pente normalisée moy.   : 0.370
+
+OCCUPATION SOL NATUREL (ESA WorldCover):
+----------------------------------------------------------------------
+Forêt moy.              : 2.7%
+Eau moy.                : 3.9%
+Végétation moy.         : 2.9%
+
+CONTEXTE URBAIN (OSMnxUrbanAgent):
+----------------------------------------------------------------------
+Obstruction index moy.  : 0.409
+Hauteur bâti moy.       : 16.2 m
+
+IMPACT RADIO (terrain + bâti intégrés):
+----------------------------------------------------------------------
+Atténuation moy.        : 15.9 dB
+Atténuation max.        : 22.1 dB
+Probabilité LOS moy.    : 53.3%
+Complexité terrain moy. : 0.392
+
+PAR URBAN_CLASS (OSMnx):
+----------------------------------------------------------------------
+
+  [dense_urban]  33 cellules
+    Atténuation moy.  : 15.8 dB
+    LOS prob. moy.    : 49.5%
+    Complexité        : 0.408
+    Forêt moy.        : 1.2%
+    Altitude moy.     : 47.2 m
+
+  [hyper_dense]  1 cellules
+    Atténuation moy.  : 16.7 dB
+    LOS prob. moy.    : 40.3%
+    Complexité        : 0.427
+    Forêt moy.        : 0.0%
+    Altitude moy.     : 46.9 m
+
+  [periurban]  5 cellules
+    Atténuation moy.  : 16.4 dB
+    LOS prob. moy.    : 62.4%
+    Complexité        : 0.372
+    Forêt moy.        : 5.7%
+    Altitude moy.     : 41.6 m
+
+  [rural]  3 cellules
+    Atténuation moy.  : 13.4 dB
+    LOS prob. moy.    : 71.3%
+    Complexité        : 0.270
+    Forêt moy.        : 3.9%
+    Altitude moy.     : 40.0 m
+
+  [urban]  12 cellules
+    Atténuation moy.  : 16.3 dB
+    LOS prob. moy.    : 56.5%
+    Complexité        : 0.383
+    Forêt moy.        : 5.7%
+    Altitude moy.     : 44.7 m
+
+Cellules totales        : 54
+
+
+
+
+
+
+
+
+======================================================================
+   RAPPORT PLACEMENT SITES 5G — SitePlacementAgent v3
+   Généré le : 2026-05-08 11:45:25
+======================================================================
+
+[ RÉSUMÉ ]
+  Sites recommandés   : 4
+  Score moyen         : 0.7951
+  Score max           : 1.0000
+
+[ DISTRIBUTION PAR TYPE DE SITE ]
+  micro_cell               :   3 sites
+  small_cell_dense         :   1 sites
+
+[ DISTRIBUTION PAR URBAN CLASS ]
+  dense_urban    :   3 sites  (score moy: 0.727  déficit moy: 1.853G)
+  hyper_dense    :   1 sites  (score moy: 1.000  déficit moy: 4.527G)
+
+[ TOP 10 SITES PAR PRIORITÉ ]
+  Rank  urban_class      type                         score    déficit    LOS  Justification
+  ----------------------------------------------------------------------------------------------------
+     1  hyper_dense      small_cell_dense            1.0000      4.53G  40.3%  déficit capacité critique (4.5 Gbps) | risque congestion critique (overload=0.88) | densité pop. élevée (21,354 hab/km²) | LOS limitée (40%) → small cell recommandé
+     2  dense_urban      micro_cell                  0.8140      2.38G  30.8%  déficit capacité significatif (2.4 Gbps) | risque congestion critique (overload=0.77) | densité pop. élevée (28,049 hab/km²) | LOS limitée (31%) → small cell recommandé
+     3  dense_urban      micro_cell                  0.8131      2.30G  46.9%  déficit capacité significatif (2.3 Gbps) | risque congestion critique (overload=0.77) | densité pop. élevée (28,047 hab/km²)
+     4  dense_urban      micro_cell                  0.5533      0.88G  32.2%  déficit capacité modéré (0.88 Gbps) | risque congestion élevé | LOS limitée (32%) → small cell recommandé
+
+[ DÉTAIL DE TOUS LES SITES ]
+
+  Site #01
+    Coordonnées    : 652278.040072, 6862976.133419
+    Urban class    : hyper_dense
+    Type           : small_cell_dense
+    Score          : 1.0000
+    Déficit        : 4.527 Gbps
+    Pop. couverte  : ~369 hab
+    Rayon couv.    : ~61 m
+    LOS            : 40.3%
+    Justification  : déficit capacité critique (4.5 Gbps) | risque congestion critique (overload=0.88) | densité pop. élevée (21,354 hab/km²) | LOS limitée (40%) → small cell recommandé
+
+  Site #02
+    Coordonnées    : 652537.332543, 6862448.278320
+    Urban class    : dense_urban
+    Type           : micro_cell
+    Score          : 0.8140
+    Déficit        : 2.379 Gbps
+    Pop. couverte  : ~485 hab
+    Rayon couv.    : ~159 m
+    LOS            : 30.8%
+    Justification  : déficit capacité significatif (2.4 Gbps) | risque congestion critique (overload=0.77) | densité pop. élevée (28,049 hab/km²) | LOS limitée (31%) → small cell recommandé
+
+  Site #03
+    Coordonnées    : 652540.562761, 6862842.549863
+    Urban class    : dense_urban
+    Type           : micro_cell
+    Score          : 0.8131
+    Déficit        : 2.303 Gbps
+    Pop. couverte  : ~485 hab
+    Rayon couv.    : ~179 m
+    LOS            : 46.9%
+    Justification  : déficit capacité significatif (2.3 Gbps) | risque congestion critique (overload=0.77) | densité pop. élevée (28,047 hab/km²)
+
+  Site #04
+    Coordonnées    : 652142.983363, 6862582.958304
+    Urban class    : dense_urban
+    Type           : micro_cell
+    Score          : 0.5533
+    Déficit        : 0.877 Gbps
+    Pop. couverte  : ~253 hab
+    Rayon couv.    : ~159 m
+    LOS            : 32.2%
+    Justification  : déficit capacité modéré (0.88 Gbps) | risque congestion élevé | LOS limitée (32%) → small cell recommandé
+
+======================================================================
+  Fin du rapport
+======================================================================

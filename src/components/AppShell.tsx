@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   LayoutDashboard,
   Map as MapIcon,
@@ -174,4 +174,18 @@ export function DistributionBar({
       ))}
     </div>
   );
+}
+
+/** Renders children only after client hydration — avoids SSR/CSR mismatches
+ * for components that depend on browser-only data (fetch from FastAPI, etc). */
+export function ClientOnly({
+  children,
+  fallback = null,
+}: {
+  children: ReactNode;
+  fallback?: ReactNode;
+}) {
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+  return <>{hydrated ? children : fallback}</>;
 }

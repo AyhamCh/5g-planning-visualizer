@@ -84,19 +84,29 @@ export interface SiteProps extends GridProps {
 export type GridFC = GeoJSON.FeatureCollection<GeoJSON.Polygon, GridProps>;
 export type SitesFC = GeoJSON.FeatureCollection<GeoJSON.Point, SiteProps>;
 
-// API base: when running the FastAPI backend (see /backend), set VITE_API_BASE
-// to e.g. http://localhost:8000. Otherwise the real GeoJSON exports under
-// /data/ (generated from the real .gpkg outputs) are used directly.
-const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, "");
+// API base resolution.
+// Priority: explicit VITE_API_BASE → http://localhost:8000 (local FastAPI) in
+// the browser → empty (static fallback). On the server we never call relative
+// URLs (no origin), so we return an empty FeatureCollection during SSR.
+const ENV_API = (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, "");
+export const API_BASE: string =
+  ENV_API ?? (typeof window !== "undefined" ? "http://localhost:8000" : "");
 
 async function fetchJson<T>(staticPath: string, apiPath: string): Promise<T> {
-  // Avoid SSR fetch of relative URLs (no origin). Return empty FC on server.
-  if (typeof window === "undefined" && !API_BASE) {
-    return { type: "FeatureCollection", features: [] } as unknown as T;
+  if (typeof window === "undefined") {
+    // Suspend forever on the server — the client will resolve the real data
+    // after hydration. This keeps SSR HTML free of placeholder values that
+    // would otherwise mismatch the first client render.
+    return new Promise<T>(() => {});
   }
-  const url = API_BASE ? `${API_BASE}${apiPath}` : staticPath;
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`${url} → ${r.status}`);
+  if (API_BASE) {
+    try {
+      const r = await fetch(`${API_BASE}${apiPath}`);
+      if (r.ok) return (await r.json()) as T;
+    } catch { /* network error → static fallback */ }
+  }
+  const r = await fetch(staticPath);
+  if (!r.ok) throw new Error(`${staticPath} → ${r.status}`);
   return (await r.json()) as T;
 }
 
