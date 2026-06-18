@@ -1,0 +1,9 @@
+name: 5g_ai_project
+channels: [conda-forge]
+dependencies:
+  - python=3.11
+  - geopandas
+  - rasterio
+  - pip
+  - pip:
+    - -r requirements.txt
