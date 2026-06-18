@@ -281,6 +281,50 @@ def main() -> None:
     if not args.build_only:
         run_qa_loop()
 
+# =============================================================================
+# API — utilisée par FastAPI (main.py → POST /api/chat)
+# =============================================================================
+
+_API_MODEL: SentenceTransformer | None = None
+_API_COLLECTION = None  # type: ignore[assignment]
+
+
+def _api_init() -> None:
+    """Lazy-load embeddings + ChromaDB collection (one-shot, process-wide)."""
+    global _API_MODEL, _API_COLLECTION
+    if _API_MODEL is None:
+        _API_MODEL = SentenceTransformer(EMBED_MODEL)
+    if _API_COLLECTION is None:
+        client = chromadb.PersistentClient(path=CHROMA_PATH)
+        _API_COLLECTION = client.get_or_create_collection(name=COLLECTION)
+
+
+def answer_question(question: str) -> dict:
+    """Answer a question using ChromaDB retrieval + Qwen via Ollama.
+
+    Returns: {"answer": str, "sources": list[str]}
+    """
+    _api_init()
+    q_emb = _API_MODEL.encode(question).tolist()                 # type: ignore[union-attr]
+    res = _API_COLLECTION.query(query_embeddings=[q_emb], n_results=N_RESULTS)  # type: ignore[union-attr]
+    docs = res["documents"][0] if res.get("documents") else []
+    metas = res["metadatas"][0] if res.get("metadatas") else []
+    context = "\n\n".join(docs)
+    sources = sorted({m.get("source", "?") for m in metas})
+
+    prompt = (
+        "You are a 5G telecommunications expert. Use the provided context as "
+        "your primary source. You may also use your general knowledge to "
+        "complete or structure the answer, but always prioritize the context.\n\n"
+        f"Context:\n{context}\n\nQuestion:\n{question}\n\nAnswer:"
+    )
+    response = chat(
+        model=LLM_MODEL,
+        messages=[{"role": "user", "content": prompt}],
+        options={"think": False},
+    )
+    return {"answer": response["message"]["content"], "sources": sources}
+
 
 if __name__ == "__main__":
     main()
