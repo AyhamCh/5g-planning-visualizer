@@ -14,7 +14,8 @@ type Msg = {
   sources?: string[];
 };
 
-const API_BASE = (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, "") ?? "";
+const ENV_API = (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, "");
+const API_BASE = ENV_API ?? (typeof window !== "undefined" ? "http://localhost:8000" : "");
 
 const SUGGESTIONS = [
   "Quelles sont les normes 3GPP applicables à la 5G NR ?",
