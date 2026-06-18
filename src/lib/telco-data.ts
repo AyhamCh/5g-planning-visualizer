@@ -94,10 +94,11 @@ export const API_BASE: string =
 
 async function fetchJson<T>(staticPath: string, apiPath: string): Promise<T> {
   if (typeof window === "undefined") {
-    return { type: "FeatureCollection", features: [] } as unknown as T;
+    // Suspend forever on the server — the client will resolve the real data
+    // after hydration. This keeps SSR HTML free of placeholder values that
+    // would otherwise mismatch the first client render.
+    return new Promise<T>(() => {});
   }
-  // Try the live FastAPI first; on any failure, fall back to the static
-  // GeoJSON snapshot shipped under /public/data/.
   if (API_BASE) {
     try {
       const r = await fetch(`${API_BASE}${apiPath}`);
