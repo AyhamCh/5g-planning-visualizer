@@ -51,15 +51,17 @@ function ReportsPage() {
 
 function ReportsBody() {
   const [reports, setReports] = useState<Report[] | null>(null);
+  const [live, setLive] = useState(true);
   const [selected, setSelected] = useState<Report | null>(null);
   const [loading, setLoading] = useState(true);
   const [textBody, setTextBody] = useState<string>("");
 
   async function load() {
     setLoading(true);
-    const list = await fetchReports();
+    const { list, live } = await fetchReports();
+    setLive(live);
     setReports(list);
-    setSelected(list && list.length ? list[0] : null);
+    setSelected(list.length ? list[0] : null);
     setLoading(false);
   }
 
