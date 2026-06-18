@@ -77,13 +77,18 @@ function ReportsBody() {
       .catch(() => setTextBody("Failed to load."));
   }, [selected]);
 
-  const fileUrl = selected ? `${API_BASE}${selected.path}` : "";
+  const fileUrl = selected
+    ? (live ? `${API_BASE}${selected.path}` : selected.path)
+    : "";
 
   return (
     <>
       <div className="mb-4 flex items-center justify-between gap-3">
         <div className="text-xs mono text-muted-foreground">
-          API: <span className="text-primary">{API_BASE || "static"}</span>
+          Source:{" "}
+          <span className={live ? "text-[var(--color-success)]" : "text-[var(--color-warning)]"}>
+            {live ? `live · ${API_BASE}` : "static preview snapshot"}
+          </span>
         </div>
         <button
           onClick={load}
@@ -93,7 +98,7 @@ function ReportsBody() {
         </button>
       </div>
 
-      {reports === null && (
+      {!live && (
         <Card className="mb-4 !bg-[var(--color-warning)]/5 border-[var(--color-warning)]/30">
           <div className="flex gap-3 text-sm">
             <AlertCircle className="size-5 text-[var(--color-warning)] shrink-0 mt-0.5" />
