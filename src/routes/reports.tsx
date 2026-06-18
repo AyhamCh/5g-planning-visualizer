@@ -19,14 +19,18 @@ type Report = {
 const ENV_API = (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, "");
 const API_BASE = ENV_API ?? (typeof window !== "undefined" ? "http://localhost:8000" : "");
 
-async function fetchReports(): Promise<Report[] | null> {
+async function fetchReports(): Promise<{ list: Report[]; live: boolean }> {
   try {
     const r = await fetch(`${API_BASE}/api/reports`);
-    if (!r.ok) throw new Error(`${r.status}`);
-    return (await r.json()) as Report[];
-  } catch {
-    return null;
-  }
+    if (r.ok) return { list: (await r.json()) as Report[], live: true };
+  } catch { /* fall through */ }
+  // Preview fallback — static snapshot in /public/outputs/
+  const STATIC: Report[] = [
+    { name: "rapport_final_5g.pdf", date: new Date().toISOString(), path: "/outputs/rapport_final_5g.pdf", kind: "pdf" },
+    { name: "agents_summary.txt", date: new Date().toISOString(), path: "/outputs/agents_summary.txt", kind: "txt" },
+    { name: "site_placement_report.txt", date: new Date().toISOString(), path: "/outputs/site_placement_report.txt", kind: "txt" },
+  ];
+  return { list: STATIC, live: false };
 }
 
 function ReportsPage() {
