@@ -76,7 +76,7 @@ function ReportsBody() {
       .then((r) => r.text())
       .then(setTextBody)
       .catch(() => setTextBody("Failed to load."));
-  }, [selected]);
+  }, [selected, live]);
 
   const fileUrl = selected
     ? (live ? `${API_BASE}${selected.path}` : selected.path)
