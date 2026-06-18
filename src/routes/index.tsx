@@ -96,16 +96,15 @@ function Dashboard() {
   const urbanData = distribution(grid, "urban_class");
   const coverageData = distribution(grid, "coverage_class");
   const demandData = distribution(grid, "demand_class");
-  const siteData = distribution(
-    {
-      ...sites,
-      features: sites.features.map((f) => ({
-        ...f,
-        properties: { ...f.properties, site_type: f.properties.site_type ?? "macro_cell" },
-      })),
-    } as never,
-    "site_type" as never,
-  );
+  const siteCounts = new Map<string, number>();
+  for (const f of sites.features) {
+    const t = (f.properties.site_type as string) ?? "macro_cell";
+    siteCounts.set(t, (siteCounts.get(t) ?? 0) + 1);
+  }
+  const siteTotal = sites.features.length || 1;
+  const siteData = [...siteCounts.entries()]
+    .map(([label, count]) => ({ label, count, ratio: count / siteTotal }))
+    .sort((a, b) => b.count - a.count);
 
   return (
     <>
