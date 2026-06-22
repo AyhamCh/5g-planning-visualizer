@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Send, Sparkles, User, Loader2 } from "lucide-react";
+import { Send, Sparkles, User, Loader2, Settings2, CheckCircle2, XCircle } from "lucide-react";
 import { AppShell, Card, PageHeader } from "@/components/AppShell";
 
 export const Route = createFileRoute("/chat")({
@@ -15,7 +15,13 @@ type Msg = {
 };
 
 const ENV_API = (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, "");
-const API_BASE = ENV_API ?? (typeof window !== "undefined" ? "http://localhost:8000" : "");
+const LS_KEY = "rag_api_base";
+
+function getApiBase(): string {
+  if (typeof window === "undefined") return ENV_API ?? "";
+  const stored = window.localStorage.getItem(LS_KEY)?.replace(/\/$/, "");
+  return stored || ENV_API || "http://localhost:8000";
+}
 
 const SUGGESTIONS = [
   "Quelles sont les normes 3GPP applicables à la 5G NR ?",
@@ -24,21 +30,27 @@ const SUGGESTIONS = [
   "Que signifie un coverage_score < 0.4 dans le grid ?",
 ];
 
-async function askRag(question: string): Promise<{ answer: string; sources?: string[] }> {
+type AskResult = { ok: true; answer: string; sources?: string[] } | { ok: false; error: string };
+
+async function askRag(apiBase: string, question: string): Promise<AskResult> {
+  const url = `${apiBase}/api/chat`;
   try {
-    const r = await fetch(`${API_BASE}/api/chat`, {
+    const r = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question }),
     });
-    if (!r.ok) throw new Error(`${r.status}`);
-    return await r.json();
-  } catch {
+    if (!r.ok) {
+      const body = await r.text().catch(() => "");
+      return { ok: false, error: `HTTP ${r.status} sur ${url}\n${body.slice(0, 400)}` };
+    }
+    const data = await r.json();
+    return { ok: true, answer: data.answer ?? "(réponse vide)", sources: data.sources };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
     return {
-      answer:
-        "⚠️ Le backend RAG n'est pas joignable. Démarre `uvicorn backend.main:app --port 8000` et configure `VITE_API_BASE`. " +
-        "Le pipeline local utilise rag_agent.py (ChromaDB + Qwen via Ollama).",
-      sources: [],
+      ok: false,
+      error: `Impossible de joindre ${url}\nRaison: ${msg}`,
     };
   }
 }
@@ -48,16 +60,53 @@ function ChatPage() {
     {
       role: "assistant",
       content:
-        "Bonjour 👋 Je suis l'assistant 5G du projet. Je peux répondre à vos questions sur les normes 5G, la planification réseau, l'implantation des sites, la couverture, l'architecture des agents et les documents techniques indexés.",
+        "Bonjour 👋 Je suis l'assistant 5G du projet (RAG + ChromaDB + Qwen via Ollama, défini dans `agents/rag_agent.py`). Posez-moi une question sur la 5G, les agents ou les résultats du pipeline.",
     },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [apiBase, setApiBase] = useState<string>("");
+  const [showSettings, setShowSettings] = useState(false);
+  const [draftBase, setDraftBase] = useState("");
+  const [health, setHealth] = useState<"unknown" | "ok" | "down">("unknown");
   const endRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const base = getApiBase();
+    setApiBase(base);
+    setDraftBase(base);
+  }, []);
+
+  useEffect(() => {
+    if (!apiBase) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch(`${apiBase}/api/health`, { method: "GET" }).catch(() =>
+          fetch(`${apiBase}/`, { method: "GET" }),
+        );
+        if (!cancelled) setHealth(r && r.ok ? "ok" : "down");
+      } catch {
+        if (!cancelled) setHealth("down");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [apiBase]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
+
+  function saveBase() {
+    const v = draftBase.trim().replace(/\/$/, "");
+    if (v) window.localStorage.setItem(LS_KEY, v);
+    else window.localStorage.removeItem(LS_KEY);
+    setApiBase(v || ENV_API || "http://localhost:8000");
+    setHealth("unknown");
+    setShowSettings(false);
+  }
 
   async function send(text: string) {
     const q = text.trim();
@@ -65,8 +114,28 @@ function ChatPage() {
     setMessages((m) => [...m, { role: "user", content: q }]);
     setInput("");
     setLoading(true);
-    const res = await askRag(q);
-    setMessages((m) => [...m, { role: "assistant", content: res.answer, sources: res.sources }]);
+    const res = await askRag(apiBase, q);
+    if (res.ok) {
+      setMessages((m) => [...m, { role: "assistant", content: res.answer, sources: res.sources }]);
+    } else {
+      setMessages((m) => [
+        ...m,
+        {
+          role: "assistant",
+          content:
+            `⚠️ Backend RAG injoignable.\n\n${res.error}\n\n` +
+            `Vérifications :\n` +
+            `1. Lance le backend localement : \`uvicorn main:app --reload --port 8000\` (depuis la racine du projet)\n` +
+            `2. Ce preview tourne sur lovable.app — il ne peut PAS joindre votre \`localhost\`. ` +
+            `Pour le tester depuis le preview, expose ton backend via un tunnel :\n` +
+            `   • \`ngrok http 8000\` → copie l'URL https générée\n` +
+            `   • ou \`cloudflared tunnel --url http://localhost:8000\`\n` +
+            `3. Ouvre ⚙️ Settings (en haut) et colle l'URL du tunnel.\n` +
+            `4. Si tu lances le frontend en local (\`bun dev\` sur localhost:8080), \`http://localhost:8000\` fonctionne directement.\n\n` +
+            `Le code RAG (\`agents/rag_agent.py\`) est correct ; le souci est purement réseau.`,
+        },
+      ]);
+    }
     setLoading(false);
   }
 
@@ -77,12 +146,61 @@ function ChatPage() {
           title="5G Knowledge Assistant"
           subtitle="Posez vos questions à propos de la 5G, des agents et des résultats."
           right={
-            <div className="flex items-center gap-2 text-xs mono text-muted-foreground">
-              <span className="size-1.5 rounded-full bg-[var(--color-success)] animate-pulse" />
-              RAG · ChromaDB · Qwen
+            <div className="flex items-center gap-3 text-xs mono">
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                {health === "ok" ? (
+                  <>
+                    <CheckCircle2 className="size-3.5 text-[var(--color-success)]" />
+                    <span className="text-[var(--color-success)]">Backend OK</span>
+                  </>
+                ) : health === "down" ? (
+                  <>
+                    <XCircle className="size-3.5 text-red-400" />
+                    <span className="text-red-400">Backend down</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="size-1.5 rounded-full bg-muted-foreground animate-pulse" />
+                    <span>checking…</span>
+                  </>
+                )}
+              </div>
+              <button
+                onClick={() => setShowSettings((s) => !s)}
+                className="flex items-center gap-1 px-2 py-1 rounded border border-border hover:border-primary/40"
+              >
+                <Settings2 className="size-3.5" /> API
+              </button>
             </div>
           }
         />
+
+        {showSettings && (
+          <Card className="mb-4 !py-3">
+            <div className="text-xs text-muted-foreground mb-2">
+              URL du backend FastAPI (qui sert <code className="mono">/api/chat</code>). Pour exposer
+              ton serveur local au preview Lovable, utilise un tunnel :{" "}
+              <code className="mono">ngrok http 8000</code>.
+            </div>
+            <div className="flex gap-2">
+              <input
+                value={draftBase}
+                onChange={(e) => setDraftBase(e.target.value)}
+                placeholder="https://xxxx.ngrok-free.app  ou  http://localhost:8000"
+                className="flex-1 bg-secondary/40 border border-border rounded px-3 py-2 text-sm mono outline-none focus:border-primary/50"
+              />
+              <button
+                onClick={saveBase}
+                className="px-3 py-2 rounded bg-primary text-primary-foreground text-sm"
+              >
+                Sauver
+              </button>
+            </div>
+            <div className="mt-2 text-[11px] text-muted-foreground mono">
+              Actuel : {apiBase || "(non défini)"}
+            </div>
+          </Card>
+        )}
 
         <Card className="flex-1 flex flex-col min-h-0 !p-0 overflow-hidden">
           <div className="flex-1 overflow-y-auto p-6 space-y-5">
@@ -157,9 +275,7 @@ function Message({ msg }: { msg: Msg }) {
     <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : ""}`}>
       <div
         className={`size-8 shrink-0 rounded-full flex items-center justify-center border ${
-          isUser
-            ? "bg-secondary border-border"
-            : "bg-primary/15 border-primary/30"
+          isUser ? "bg-secondary border-border" : "bg-primary/15 border-primary/30"
         }`}
       >
         {isUser ? <User className="size-4" /> : <Sparkles className="size-4 text-primary" />}
